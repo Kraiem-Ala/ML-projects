@@ -23,7 +23,7 @@ def keys_to_output(keys):
     return output
 
 
-file_name = 'training_data.npy'
+file_name = 'training_data_1.npy'
 
 if os.path.isfile(file_name):
     print('File exists, loading previous data!')
@@ -52,6 +52,8 @@ def main():
             cv2.destroyAllWindows()
             break
         if keyboard.is_pressed('b'):
+            print(len(training_data))
+            np.save(file_name, training_data)
             break
         if len(training_data) % 500 == 0:
             print(len(training_data))

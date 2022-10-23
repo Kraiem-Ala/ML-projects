@@ -3,6 +3,7 @@ import numpy as np
 import time
 import cv2
 import keyboard
+from grabscreen import grab_screen
 thresh1=100
 thresh2=250
 import pyautogui
@@ -139,21 +140,27 @@ def stop_proc():
 
 start_proc()
 while(True):
-    screenshot = np.array(ImageGrab.grab(bbox=(0,35,1280,650)))
-    new_screen,a1,a2 = process_image(screenshot)
-    cv2.imshow('window',new_screen)
+    screen = grab_screen(region=(0, 35, 1280, 650))
+    screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
+    cv2.imshow('window', screen)
     if cv2.waitKey(25) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         break
-    if abs(a1+a2)<1:
-        print("forward",abs(a1+a2))
-        forward()
-    elif a1+a2 < - 1:
-        print("right", (a1+a2))
-        right()
-    elif a1+a2 > 1:
-        print("left", (a1+a2))
-        left()
-    print(a1,a2)
-stop()
-stop_proc()
+#     screenshot = np.array(ImageGrab.grab(bbox=(0,35,1280,650)))
+#     new_screen,a1,a2 = process_image(screenshot)
+#     cv2.imshow('window',new_screen)
+#     if cv2.waitKey(25) & 0xFF == ord('q'):
+#         cv2.destroyAllWindows()
+#         break
+#     if abs(a1+a2)<1:
+#         print("forward",abs(a1+a2))
+#         forward()
+#     elif a1+a2 < - 1:
+#         print("right", (a1+a2))
+#         right()
+#     elif a1+a2 > 1:
+#         print("left", (a1+a2))
+#         left()
+#     print(a1,a2)
+# stop()
+# stop_proc()

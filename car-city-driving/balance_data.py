@@ -4,7 +4,7 @@ from collections import Counter
 import cv2
 from random import shuffle
 
-train_data = np.load('training_data.npy',allow_pickle=True)
+train_data = np.load('training_data_1.npy',allow_pickle=True)
 df = pd.DataFrame(train_data)
 print(df.head())
 print(Counter(df[1].apply(str)))
@@ -30,7 +30,7 @@ rights = rights[:len(forwards)]
 final_data = forwards + lefts + rights
 shuffle(final_data)
 print("we have",len(final_data))
-np.save('training_data_v2.npy', final_data)
+np.save('training_data_1_v2.npy', final_data)
 # for data in train_data:
 #     img=data[0]
 #     choice=data[1]

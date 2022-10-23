@@ -10,8 +10,8 @@ from alexnet_2 import alexnet
 WIDTH = 80
 HEIGHT = 60
 LR = 1e-3
-EPOCHS = 6
-MODEL_NAME = 'city-car-{}-{}-{}-epochs.model'.format(LR, 'alexnetv2', EPOCHS)
+EPOCHS = 8
+MODEL_NAME = 'city-car-1-{}-{}-{}-epochs.model'.format(LR, 'alexnetv2', EPOCHS)
 
 
 def forward():
@@ -21,19 +21,26 @@ def forward():
 
 
 def right():
+    pyautogui.keyUp('q')
     pyautogui.keyDown('d')
-    pyautogui.keyUp('z')
+    pyautogui.keyDown('z')
+    time.sleep(0.2)
+    pyautogui.keyUp('d')
 
 
 def left():
+    pyautogui.keyUp('d')
     pyautogui.keyDown('q')
-    pyautogui.keyUp('z')
+    pyautogui.keyDown('z')
+    time.sleep(0.2)
+    pyautogui.keyUp('q')
+
 
 
 def stop():
     pyautogui.keyUp('z')
     pyautogui.keyDown('s')
-    time.sleep(0.2)
+    time.sleep(0.5)
     pyautogui.keyUp('s')
 
 
@@ -76,7 +83,7 @@ def main():
                 paused = True
                 pyautogui.keyUp('z')
                 pyautogui.keyUp('q')
-                pyautogui.keyUp ('d')
+                pyautogui.keyUp('d')
                 stop()
                 time.sleep(0.5)
         elif 'P' in keys:
