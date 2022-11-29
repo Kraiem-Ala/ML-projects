@@ -7,15 +7,15 @@ import random
 class yajour():
     def __init__(self, level, factor):
         self.factor = factor
-        self.height = int(10 * factor)
-        self.width = int(40 * factor)
         self.level = level
         self.colors = [(0, 0, 0), (0, 255, 127), (0, 191, 255), (255, 99, 71)]
         self.block = []
         self.rects = []
 
     def wall(self, rows, cols):
-        for row in range(3,rows+3):
+        self.height = int((80* self.factor)/rows)
+        self.width = int((200* self.factor)/cols)
+        for row in range(rows):
             block_row = []
             block1=[]
             for col in range(cols):
@@ -89,7 +89,7 @@ class ball(object):
         super(ball, self).__init__()
         self.direction_x = random.choice([1,-1])
         self.direction_y = 1
-        self.ball_image = pygame.image.load(f"ball_games/{factor * 200}/ball{level}.png")
+        self.ball_image = pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/ball_games/{factor * 200}/ball{level}.png")
         if factor==2:
             self.size_x=20
             self.size_y=20
@@ -98,18 +98,19 @@ class ball(object):
             self.size_y = 10
         self.pos_x = int((200 * factor) / 2)
         self.pos_y = int((200 * factor) / 2)
-        self.speed_x = 1+level
-        self.speed_y = 1+level
+        self.speed_x = 2+level
+        self.speed_y = 2+level
         self.factor = factor
         self.rect=pygame.Rect(self.pos_x, self.pos_y, self.size_x, self.size_y)
 
     def draw(self,screen):
         self.move()
-        screen.blit(self.ball_image, (self.pos_x-self.size_x/2, self.pos_y-self.size_y/2))
+        screen.blit(self.ball_image, (self.pos_x, self.pos_y))
+        #pygame.draw.rect(screen, (0,0,0), self.rect)
 
     def move(self):
-        self.pos_x += (self.speed_x*self.direction_x)
-        self.pos_y += (self.speed_y*self.direction_y)
+        self.pos_x += (self.speed_x * self.direction_x)
+        self.pos_y += (self.speed_y * self.direction_y)
         self.rect.move_ip(self.speed_x*self.direction_x,self.speed_y*self.direction_y)
     def reset(self):
          self.direction_x = 1
@@ -124,24 +125,31 @@ class breakout(object):
     """docstring for breakout"""
 
     def __init__(self, width=200, height=200):
-        super(breakout, self).__init__()
+        #super(breakout, self).__init__()
         pygame.init()
         self.tries=5
         self.width = width
         self.height = height
         self.factor = int(self.width / 200)
         self.level = 1
-        self.level_rows = 3 + self.level
-        self.level_col = 4
+        self.level_rows = 6
+        self.level_col = 7
         self.blocks = yajour(self.level, self.factor)
         self.badle = badlle(self.factor)
         self.ball=ball(self.factor,self.level)
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.bg = pygame.image.load(f"background/{self.width}/level{self.level}.jpg")
+        self.bg = pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/background/{self.width}/level{self.level}.jpg")
         self.clock = pygame.time.Clock()
         self.fps = 50
         self.destryed_bricks=0
         pygame.display.set_caption('Breakout')
+
+    def setup(self):
+        self.ball = ball(self.factor, self.level)
+        self.screen = pygame.display.set_mode((self.width, self.height))
+        self.bg = pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/background/{self.width}/level{1}.jpg")
+        self.badle.draw_paddle(self.screen)
+        self.blocks.wall(self.level_rows, self.level_col)
 
     def close(self):
         pygame.quit()
@@ -171,16 +179,13 @@ class breakout(object):
                     self.ball.direction_x *= -1
                     to_delete.append([row_i,row.index(block)])
                     self.destryed_bricks+=1
-                    #print("case3")
                 elif (block[0].left<=self.ball.rect.right<=block[0].left+2) and (block[0].top <= self.ball.rect.centery<=block[0].bottom):
                     self.ball.direction_x *= -1
                     to_delete.append([row_i,row.index(block)])
                     self.destryed_bricks+=1
-                    #print("case4")
-                for index in to_delete:
+        for index in to_delete:
                     #print(index)
-                    self.blocks.block[index[0]][index[1]][0]=pygame.Rect(0,0,0,0)
-
+            self.blocks.block[index[0]][index[1]][0]=pygame.Rect(0,0,0,0)
 
     def ball_movement(self):
         if (self.ball.pos_y >= (self.badle.y - self.badle.height)) :
@@ -196,23 +201,26 @@ class breakout(object):
         if ((self.ball.pos_x <= 0)or(self.ball.pos_x >= self.width)) and (0<= self.ball.pos_y <=self.height):
             self.ball.direction_x = -1 * self.ball.direction_x
             #print("touch walls")
-        level_info=self.check_blocks()
         if (self.ball.pos_y >= self.height):
             print("Game Over")
             return True
+        self.check_blocks()
         self.ball.draw(self.screen)
         return False
 
 
-    def reset_game(self):
+    def reset_game(self,all=False):
         self.badle.reset()
         self.ball.reset()
-        #self.destryed_bricks=0
+        if all == True:
+            self.blocks.block=[]
+            self.blocks.wall(self.level_rows,self.level_col)
+            self.destryed_bricks=0
 
     def render(self,level,max_tries):
         self.ball = ball(self.factor, level)
         self.screen = pygame.display.set_mode((self.width, self.height))
-        self.bg = pygame.image.load(f"background/{self.width}/level{level}.jpg")
+        self.bg = pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/background/{self.width}/level{level}.jpg")
         self.level=level
         self.blocks.wall(self.level_rows, self.level_col)
         self.badle.draw_paddle(self.screen)
@@ -239,54 +247,41 @@ class breakout(object):
                 run=True
                 level_done = False
             if len(self.blocks.block) * len(self.blocks.block[0]) == self.destryed_bricks:
-                win=pygame.image.load(f"background/{self.width}/victory.jpg")
+                win=pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/background/{self.width}/victory.jpg")
                 self.screen.blit(win,(50,50))
                 pygame.display.update()
                 time.sleep(5)
                 run=True
                 level_done = True
             img=pygame.surfarray.array3d(self.screen)
-            print(type(img))
         return self.destryed_bricks, level_done
 
-    def render(self,action,contin):
-        img=[]
-        self.ball = ball(self.factor,1)
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        self.bg = pygame.image.load(f"background/{self.width}/level{1}.jpg")
-        self.blocks.wall(self.level_rows, self.level_col)
-        self.badle.draw_paddle(self.screen)
+    def stepping(self,action):
         level_done=False
-        while not contin:
-            self.clock.tick(self.fps)
-            self.screen.fill((255, 0, 0))
-            self.screen.blit(self.bg, (0, 0))
-            self.build_wall(self.screen)
-            self.badle.move(action)
-            self.badle.draw_paddle(self.screen)
-            info=self.ball_movement()
-            if info == True:
+        self.badle.move(action)
+        #self.clock.tick(self.fps)
+        self.screen.fill((255, 0, 0))
+        self.screen.blit(self.bg, (0, 0))
+        self.build_wall(self.screen)
+        self.badle.draw_paddle(self.screen)
+        info = self.ball_movement()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 level_done = True
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    level_done=True
-                    break
+        pygame.display.update()
+        if len(self.blocks.block) * len(self.blocks.block[0]) == self.destryed_bricks:
+            win = pygame.image.load(f"C:/Users/Kraiem Ala Eddine/Desktop/Machine learning tuto/ML-project/Breakout/games/background/{self.width}/victory.jpg")
+            self.screen.blit(win, (50, 50))
             pygame.display.update()
-            if len(self.blocks.block) * len(self.blocks.block[0]) == self.destryed_bricks:
-                win=pygame.image.load(f"background/{self.width}/victory.jpg")
-                self.screen.blit(win,(50,50))
-                pygame.display.update()
-                #time.sleep(5)
-                #run=True
-                level_done = True
-            img=pygame.surfarray.array3d(self.screen)
-            img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            print(action)
+            time.sleep(0.5)
+            level_done = True
+        if info==True:
+            level_done = True
+        img = pygame.surfarray.array3d(self.screen)
         return img,self.destryed_bricks, level_done
 
     def step(self,action):
-        done=False
-        state,score,done=self.render(action,done)
+        state,score,done=self.stepping(action)
         return state,score,done
 
     def play_game(self):
@@ -306,20 +301,16 @@ class breakout(object):
 
 def main():
     sequence=[]
-    game = breakout(width=200, height=200)
-    done=False
-    while not done:
-        action=random.choice([0,1])
-        state,score,done=game.step(action)
-        #state=tf.image.resize(state,[80,80],method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-        #state=cv2.resize(state,(80,80),interpolation=cv2.INTER_CUBIC)
-        #sequence.append(state)
-    # for i,image in enumerate(sequence):
-    #     cv2.imshow(f"image {i}", image)
-    # cv2.waitKey(0)
-
-
-
-
-if __name__ == '__main__':
-    main()
+    game = breakout(width=400, height=400)
+    game.setup()
+    #game.play_game()
+    for _ in range (10):
+        done = False
+        while not done:
+            action=random.choice([0,1])
+            state,score,done=game.step(action)
+        print(f"Score on episode {score}")
+        game.reset_game(all=True)
+    # # for i,image in enumerate(sequence):
+    # #     cv2.imshow(f"image {i}", image)
+    # # cv2.waitKey(0)
